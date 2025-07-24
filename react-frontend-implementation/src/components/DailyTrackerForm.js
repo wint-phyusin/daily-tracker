@@ -3,7 +3,8 @@ import Cookies from 'js-cookie';
 import EntryTable from './EntryTable';
 
 const DailyTrackerForm = () => {
-  const [entries, setEntries] = useState([]);
+  const storeEntries = JSON.parse(localStorage.getItem('entries'))
+  const [entries, setEntries] = useState(storeEntries);
   const [formData, setFormData] = useState({
     day: '',
     date: '',
@@ -39,16 +40,15 @@ const DailyTrackerForm = () => {
     });
   };
 
-  useEffect(() => {
-    const savedEntries = Cookies.get('daily_entries');
-    if (savedEntries) {
-      setEntries(JSON.parse(savedEntries));
-    }
-  }, []);
+  const handleDelete = (index) => {
+    const updatedEntries = [...entries];
+    updatedEntries.splice(index, 1);
+    setEntries(updatedEntries);
+  };
 
-   // Save entries to cookies whenever they change
-   useEffect(() => {
-    Cookies.set('daily_entries', JSON.stringify(entries), { expires: 7 }); // expires in 7 days
+  useEffect(() => {
+    localStorage.setItem('entries',JSON.stringify(entries))
+    console.log(storeEntries)
   }, [entries]);
 
 
@@ -134,7 +134,7 @@ const DailyTrackerForm = () => {
         <button type="submit" className="btn btn-success">Add Entry</button>
       </form>
 
-      <EntryTable entries={entries} onUpdate={handleUpdate} />
+      <EntryTable entries={entries} onUpdate={handleUpdate} onDelete={handleDelete} />
     </div>
   );
 };

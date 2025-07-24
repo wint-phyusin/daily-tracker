@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const EntryTable = ({ entries, onUpdate }) => {
+const EntryTable = ({ entries, onUpdate , onDelete}) => {
   const [editIndex, setEditIndex] = useState(null);
   const [editEntry, setEditEntry] = useState({});
 
@@ -19,6 +19,7 @@ const EntryTable = ({ entries, onUpdate }) => {
     setEditIndex(null);
     setEditEntry({});
   };
+
 
   return (
     <div className="card p-3 shadow">
@@ -60,8 +61,11 @@ const EntryTable = ({ entries, onUpdate }) => {
                     <td>{entry.remaining}</td>
                     <td>{entry.notes}</td>
                     <td>
+                    <div className="d-flex gap-2">
                       <button className="btn btn-sm btn-primary" onClick={() => handleEditClick(idx)}>Edit</button>
-                    </td>
+                      <button className="btn btn-sm btn-danger" onClick={() => onDelete(idx)}>Delete</button>
+                    </div>
+                  </td>
                   </>
                 )}
               </tr>
