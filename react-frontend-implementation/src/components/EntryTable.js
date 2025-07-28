@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const EntryTable = ({ entries, onUpdate , onDelete}) => {
+const EntryTable = ({ entries, onUpdate, onDelete }) => {
   const [editIndex, setEditIndex] = useState(null);
   const [editEntry, setEditEntry] = useState({});
 
@@ -11,7 +11,19 @@ const EntryTable = ({ entries, onUpdate , onDelete}) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEditEntry({ ...editEntry, [name]: value });
+
+    // Update the edited entry and recalc remaining if needed
+    const updatedEntry = { ...editEntry, [name]: value };
+
+    if (name === 'startAmount' || name === 'spent') {
+      const start = parseInt(updatedEntry.startAmount, 10) || 0;
+      const spent = parseInt(updatedEntry.spent, 10) || 0;
+      updatedEntry.remaining = start - spent;
+      updatedEntry.today_saving = Math.max(0, Math.floor(updatedEntry.remaining * 0.2));
+      setEditEntry(updatedEntry);
+    }
+
+    setEditEntry(updatedEntry);
   };
 
   const handleSave = () => {
@@ -19,7 +31,6 @@ const EntryTable = ({ entries, onUpdate , onDelete}) => {
     setEditIndex(null);
     setEditEntry({});
   };
-
 
   return (
     <div className="card p-3 shadow">
@@ -34,6 +45,7 @@ const EntryTable = ({ entries, onUpdate , onDelete}) => {
               <th>Spent</th>
               <th>Remaining</th>
               <th>Notes</th>
+              <th>Today Saving</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -46,10 +58,16 @@ const EntryTable = ({ entries, onUpdate , onDelete}) => {
                     <td><input name="date" value={editEntry.date} onChange={handleChange} /></td>
                     <td><input name="startAmount" value={editEntry.startAmount} onChange={handleChange} /></td>
                     <td><input name="spent" value={editEntry.spent} onChange={handleChange} /></td>
-                    <td><input name="remaining" value={editEntry.remaining} onChange={handleChange} /></td>
+                    <td>
+                      {/* Make remaining readonly since it's auto-calculated */}
+                      <input name="remaining" value={editEntry.remaining} readOnly />
+                    </td>
                     <td><input name="notes" value={editEntry.notes} onChange={handleChange} /></td>
                     <td>
                       <button className="btn btn-sm btn-success" onClick={handleSave}>Save</button>
+                    </td>
+                    <td>
+                      <input name="Today Saving" value={editEntry.today_saving} onClick={handleChange} />
                     </td>
                   </>
                 ) : (
@@ -60,12 +78,13 @@ const EntryTable = ({ entries, onUpdate , onDelete}) => {
                     <td>{entry.spent}</td>
                     <td>{entry.remaining}</td>
                     <td>{entry.notes}</td>
+                    <td>{entry.today_saving}</td>
                     <td>
-                    <div className="d-flex gap-2">
-                      <button className="btn btn-sm btn-primary" onClick={() => handleEditClick(idx)}>Edit</button>
-                      <button className="btn btn-sm btn-danger" onClick={() => onDelete(idx)}>Delete</button>
-                    </div>
-                  </td>
+                      <div className="d-flex gap-2">
+                        <button className="btn btn-sm btn-primary" onClick={() => handleEditClick(idx)}>Edit</button>
+                        <button className="btn btn-sm btn-danger" onClick={() => onDelete(idx)}>Delete</button>
+                      </div>
+                    </td>
                   </>
                 )}
               </tr>

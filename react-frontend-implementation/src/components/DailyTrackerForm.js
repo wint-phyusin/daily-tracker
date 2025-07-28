@@ -10,6 +10,7 @@ const DailyTrackerForm = () => {
     startAmount: '',
     spent: '',
     remaining: '',
+    today_saving: '',
     notes: ''
   });
 
@@ -21,6 +22,8 @@ const DailyTrackerForm = () => {
       const start = parseInt(updatedForm.startAmount) || 0;
       const spent = parseInt(updatedForm.spent) || 0;
       updatedForm.remaining = start - spent;
+      updatedForm.today_saving = Math.max(0, Math.floor(updatedForm.remaining * 0.2));
+      setFormData(updatedForm);
     }
 
     setFormData(updatedForm);
@@ -35,6 +38,7 @@ const DailyTrackerForm = () => {
       startAmount: '',
       spent: '',
       remaining: '',
+      today_saving: '',
       notes: ''
     });
   };
@@ -116,6 +120,15 @@ const DailyTrackerForm = () => {
               placeholder="Remaining"
               value={formData.remaining}
               readOnly
+            />
+          </div>
+          <div className="col">
+            <input
+              type="number"
+              name="today_saving"
+              className="form-control"
+              placeholder="Today Saving"
+              value={formData.today_saving}
             />
           </div>
         </div>
