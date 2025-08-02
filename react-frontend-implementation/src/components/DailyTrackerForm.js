@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import EntryTable from './EntryTable';
 
 const DailyTrackerForm = () => {
-  const storeEntries = JSON.parse(localStorage.getItem('entries'))
+  const storeEntries = JSON.parse(localStorage.getItem('entries')) || [];
+
   const [entries, setEntries] = useState(storeEntries);
   const [formData, setFormData] = useState({
     day: '',
     date: '',
     startAmount: '',
+    income: '', // ✅ added income
     spent: '',
     remaining: '',
     today_saving: '',
@@ -18,12 +20,13 @@ const DailyTrackerForm = () => {
     const { name, value } = e.target;
     const updatedForm = { ...formData, [name]: value };
 
-    if (name === 'startAmount' || name === 'spent') {
+    if (name === 'startAmount' || name === 'spent' || name === 'income') {
       const start = parseInt(updatedForm.startAmount) || 0;
+      const income = parseInt(updatedForm.income) || 0;
       const spent = parseInt(updatedForm.spent) || 0;
-      updatedForm.remaining = start - spent;
+
+      updatedForm.remaining = start + income - spent;
       updatedForm.today_saving = Math.max(0, Math.floor(updatedForm.remaining * 0.2));
-      setFormData(updatedForm);
     }
 
     setFormData(updatedForm);
@@ -36,6 +39,7 @@ const DailyTrackerForm = () => {
       day: '',
       date: '',
       startAmount: '',
+      income: '',
       spent: '',
       remaining: '',
       today_saving: '',
@@ -50,10 +54,8 @@ const DailyTrackerForm = () => {
   };
 
   useEffect(() => {
-    localStorage.setItem('entries',JSON.stringify(entries))
-    console.log(storeEntries)
+    localStorage.setItem('entries', JSON.stringify(entries));
   }, [entries]);
-
 
   const handleUpdate = (index, updatedEntry) => {
     const updatedEntries = [...entries];
@@ -104,6 +106,16 @@ const DailyTrackerForm = () => {
           <div className="col">
             <input
               type="number"
+              name="income"
+              className="form-control"
+              placeholder="Income"
+              value={formData.income}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="col">
+            <input
+              type="number"
               name="spent"
               className="form-control"
               placeholder="Spent"
@@ -129,6 +141,7 @@ const DailyTrackerForm = () => {
               className="form-control"
               placeholder="Today Saving"
               value={formData.today_saving}
+              readOnly
             />
           </div>
         </div>
